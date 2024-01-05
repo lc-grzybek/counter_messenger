@@ -13,10 +13,6 @@ $messages = [];
  * @return void
  */
 
-$fixMojibakeEscapes = function ($matches) {
-    return hex2bin($matches[1]);
-};
-
 function decodeAndJoin (&$participants, &$messages, $sources)
 {        
     foreach($sources as $source){
