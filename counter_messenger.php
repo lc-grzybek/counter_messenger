@@ -12,7 +12,6 @@ $messages = [];
  * @param mixed $messages
  * @return void
  */
-
 function decodeAndJoin (&$participants, &$messages, $sources)
 {        
     foreach($sources as $source){
