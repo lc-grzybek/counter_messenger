@@ -1,37 +1,26 @@
 <?php
-echo "Enter directory containing JSON files eg. message_1.json, message_2.json\n ";
-$directory = readline(">>");
-$pattern = $directory . DIRECTORY_SEPARATOR .  "message_" . "*.json";
-$sources = glob($pattern);
-//print_r($sources);
-$participants = [];
-$messages = [];
+const FILENAMEPATH = "message_1.json";
 
-/* Summary of decode
+/**
+ * Summary of decode
  * @param mixed $participants
  * @param mixed $messages
  * @return void
  */
-
-$fixMojibakeEscapes = function ($matches) {
-    return hex2bin($matches[1]);
-};
-
-function decodeAndJoin (&$participants, &$messages, $sources)
-{        
-    foreach($sources as $source){
-    $jsonData = file_get_contents($source);    
+function decode (&$participants, &$messages)
+{
+    
+    $jsonData = file_get_contents(FILENAMEPATH);
     $data = json_decode($jsonData, true);
         if ($data !== null) 
         {
-            $participants = array_merge($participants, $data['participants']);
-            $messages = array_merge($messages, $data['messages']);   
+            $participants = $data['participants'];
+            $messages = $data['messages'];   
         } 
     else 
         {
             echo "Error decoding JSON";
         }
-    }
 }
 
 /**
@@ -75,7 +64,7 @@ function countMessages($messages, $firstParticipant, $secondParticipant, &$count
         }  
     }
 }
-decodeAndJoin($participants, $messages, $sources);
+decode($participants, $messages);
 getParticipants($participants, $firstParticipant, $secondParticipant);
 countMessages($messages, $firstParticipant, $secondParticipant, $countFirst, $countSecond);
 echo $firstParticipant ." ". $countFirst ;
