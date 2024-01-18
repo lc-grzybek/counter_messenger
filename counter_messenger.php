@@ -3,24 +3,31 @@ echo "Enter directory containing JSON files eg. message_1.json, message_2.json\n
 $directory = readline(">>");
 $pattern = $directory . DIRECTORY_SEPARATOR .  "message_" . "*.json";
 $sources = glob($pattern);
-//print_r($sources);
 $participants = [];
 $messages = [];
-
+/*
 /* Summary of decode
  * @param mixed $participants
  * @param mixed $messages
  * @return void
  */
+
+
+
 function decodeAndJoin (&$participants, &$messages, $sources)
-{        
+{      
+   
     foreach($sources as $source){
-    $jsonData = file_get_contents($source);    
-    $data = json_decode($jsonData, true);
+    $jsonData = file_get_contents($source);
+    $fixMojibakeEscapes = function ($matches) {
+        return hex2bin($matches[1]);
+    };    
+    $repaired = preg_replace_callback('/\\\\u00([\da-f]{2})/i', $fixMojibakeEscapes, $jsonData);
+    $data = json_decode($repaired, true);
         if ($data !== null) 
-        {
-            $participants = array_merge($participants, $data['participants']);
-            $messages = array_merge($messages, $data['messages']);   
+        {            
+            $participants = array_merge($participants, $data['participants']);            
+            $messages = array_merge($messages, $data['messages']);          
         } 
     else 
         {
@@ -28,7 +35,6 @@ function decodeAndJoin (&$participants, &$messages, $sources)
         }
     }
 }
-
 /**
  * Summary of getParticipants
  * @param mixed $participants
@@ -40,9 +46,8 @@ function getParticipants($participants,&$firstParticipant, &$secondParticipant)
         if ($key === 0 && isset($participant['name'])) {
             $firstParticipant = $participant['name'];
         } 
-        elseif ($key === 1 && isset($participant['name'])) 
-        {
-        $secondParticipant = $participant['name'];
+        elseif ($key === 1 && isset($participant['name'])) {
+            $secondParticipant = $participant['name'];
         }
         
     }
@@ -73,6 +78,6 @@ function countMessages($messages, $firstParticipant, $secondParticipant, &$count
 decodeAndJoin($participants, $messages, $sources);
 getParticipants($participants, $firstParticipant, $secondParticipant);
 countMessages($messages, $firstParticipant, $secondParticipant, $countFirst, $countSecond);
-echo $firstParticipant ." ". $countFirst ;
+echo $firstParticipant ." ". $countFirst;
 echo PHP_EOL;
-echo $secondParticipant ." ". $countSecond ;
+echo $secondParticipant ." ". $countSecond;
